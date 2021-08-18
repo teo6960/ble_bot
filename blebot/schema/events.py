@@ -1,22 +1,8 @@
-from sqlalchemy import create_engine
-from sqlalchemy.engine.url import URL
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime
-from . import ArraySet
-from sqlalchemy.orm import sessionmaker
-
-Base = declarative_base()
-
 import datetime
+from sqlalchemy import Column, Integer, String, DateTime
 
-DATABASE = {
-    'drivername': 'postgres',
-    'host': 'localhost',
-    'port': '5432',
-    'username': 'postgres',
-    'password': 'blerocks',
-    'database': 'mydb'
-}
+from . import  Base
+from .datatypes import ArraySet
 
 class Event(Base):
     __tablename__ = "events"
@@ -53,22 +39,3 @@ class Event(Base):
             maybe=", ".join(self.maybe) if self.maybe else "No one",
             created=self.created_by
         )
-
-
-def connection():
-    return create_engine(URL(**DATABASE))
-
-def get_session():
-    conn = connection()
-    return sessionmaker(bind=conn)()
-
-def create_database():
-    db_engine = connection()
-    Base.metadata.create_all(bind=db_engine)
-
-def alter_table():
-    db_engine = connection()
-    db_engine.execute("DROP TABLE events")
-if __name__ == "__main__":
-    create_database()
-    # alter_table()

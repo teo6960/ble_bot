@@ -1,0 +1,10 @@
+websockets==2.7
+pytz==2016.3
+python-dateutil==2.5.2
+psycopg2==2.6.1
+parsedatetime==2.1
+discord.py==0.10.0-alpha
+asyncio==3.4.3
+SQLAlchemy==1.0.12
+PyNaCl==1.0.1
+DateTime==4.1

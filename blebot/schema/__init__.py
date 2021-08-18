@@ -1,32 +1,22 @@
-from sqlalchemy.ext.mutable import Mutable
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy import create_engine
+from sqlalchemy.engine.url import URL
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-modmethods = ['add', 'clear', 'difference_update', 'discard',
-              'intersection_update', 'pop', 'remove',
-              'symmetric_difference_update', 'update',
-              '__ior__', '__iand__', '__isub__', '__ixor__']
+DATABASE = {
+    'drivername': 'postgres',
+    'host': 'localhost',
+    'port': '5432',
+    'username': 'postgres',
+    'password': 'blerocks',
+    'database': 'mydb'
+}
 
-class MutableSet(Mutable, set):
-    @classmethod
-    def coerce(cls, key, value):
-        if not isinstance(value, cls):
-            return cls(value)
-        else:
-            return value
+Base = declarative_base()
 
-def _make_mm(mmname):
-    def mm(self, *args, **kwargs):
-        try:
-            retval = getattr(set, mmname)(self, *args, **kwargs)
-        finally:
-            self.changed()
-        return retval
-    return mm
+def connection():
+    return create_engine(URL(**DATABASE))
 
-for m in modmethods:
-    setattr(MutableSet, m, _make_mm(m))
-
-del modmethods, _make_mm
-
-def ArraySet(_type, dimensions=1):
-    return MutableSet.as_mutable(ARRAY(_type, dimensions=dimensions))
+def get_session():
+    conn = connection()
+    return sessionmaker(bind=conn)()
